@@ -251,12 +251,12 @@ class TimelyScheduleImportController extends Controller
                 //Delete all services currently associated with the appointment
                 $deleted = DB::table('services')->where('appointment_id', $appt->id)->delete();
             }
-
+            
             $lighteningServices = array('Parting Classic Foils', '1/2 Head Classic Foils', '3/4 Head Classic Foils', 'Full Head Classic Foils', 'Full Head Balayage', '3/4 Head Balayage');
-            $colouringServices = array('All Over Permanent Colour', 'All Over Semi-Permanent Colour', 'Hairline Permanent Colour', 'Hairline Semi-Permanent Colour', 'Retouch Permanent Colour', 'Retouch Semi-Permanent Colour');
-            $addOnFoilServices = array('10 Foils with Global Colour', '15 Foils with Global Colour', '20 Foils with Global Colour');
-            $smartbondServices = array('Smartbond');
-            $treatmentServices = array('Express Treatment', 'Deluxe Treatment Fibercutic', 'ProFiber In Salon Treatment');
+            $colouringServices = array('Permanent Colour - Roots and Ends', 'Permanent Colour - Roots Only', 'Permanent Colour - Hairline', 'Semi-Permanent Colour - Roots and Ends', 'Semi-Permanent Colour - Roots Only', 'Semi-Permanent Colour - Hairline', 'All Over Permanent Colour', 'All Over Semi-Permanent Colour', 'Hairline Permanent Colour', 'Hairline Semi-Permanent Colour', 'Retouch Permanent Colour', 'Retouch Semi-Permanent Colour');
+            $addOnFoilServices = array('10 Foils with Global Colour', '15 Foils with Global Colour', 'Permanent Colour - Hairline', '20 Foils with Global Colour');
+            $smartbondServices = array('Smartbond', 'Smartbond Protection');
+            $treatmentServices = array('Express Treatment', 'Deluxe Treatment Fibercutic', 'ProFiber In Salon Treatment', 'Express Powermix Treatment', 'Deluxe Powermix Treatment', 'Instant Colour Seal Treatment');
             $cuttingServices = array('Style Cut', 'Restyle Cut', 'Clipper Cut', 'Maintenance Cut');
             $stylingServices = array('Style 20', 'Style 30', 'Style 40', 'Style 50', 'Style 60', 'Style 20 - with Cut or Colour', 'Style 30 - with Cut or Colour', 'Style 40 - with Cut or Colour', 'Style 50 - with Cut or Colour', 'Style 60 - with Cut or Colour');
             $tonerServices = array('Tone 15', 'Tone 30');

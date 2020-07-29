@@ -19,7 +19,7 @@
                     <select class=" border border-gray-600 focus:border-2 focus:border-gray-600" name="reportPeriod"
                         id="reportPeriod">
                         <option value="0">-- Select Filter --</option>
-                        {{-- <option value="1">Today</option> --}}
+                        <option value="1">Today</option>
                         <option value="2">Yesterday</option>
                         <option value="3">Last 7 Days</option>
                         <option value="4">Last 14 Days</option>
@@ -29,9 +29,12 @@
                         <option value="7">This Month</option> --}}
                         <option value="8">Last Week</option>
                         <option value="9">Last Month</option>
+                        <option value="10">Two Weeks Ago</option>
+                        <option value="11">Two Months Ago</option>
+                        <option value="12">Last 5 Days</option>
                     </select>
 
-                    <button class="ml-4 px-6 py-1 bg-blue-900 text-gray-100 border-gray-600 bg-gray-600 rounded-lg"
+                    <button class="ml-4 px-6 py-1 text-gray-100 border-gray-600 bg-gray-600 rounded-lg"
                         type="submit">Apply Filter</button>
                 </form>
 
@@ -73,24 +76,9 @@
             {{-- Title --}}
             <div>
                 <div class="flex justify-between px-6 py-2 align-middle bg-blue-900 text-gray-100 rounded-t-lg">
-                    <span class="font-semibold">Service Category Dashboard
+                    <span class="font-semibold">Not So Fancy Service Category Dashboard
                     </span>
-                    <span class=" text-sm">Currently reporting data from
-                        @if ($reportPeriod == 1)
-                        today
-                        @elseif ($reportPeriod == 2)
-                        yesterday
-                        @elseif ($reportPeriod == 3)
-                        the last 7 days
-                        @elseif ($reportPeriod == 4)
-                        the last 14 days
-                        @elseif ($reportPeriod == 5)
-                        the last 28 days
-                        @elseif ($reportPeriod == 6)
-                        the last 210
-                        the last 7 days
-                        @endif
-                    </span>
+                    <span class=" text-sm">Currently reporting data from {{ $apptDateFromInclusive->format('D d/m/Y') }} to {{ $apptDateToInclusive->format('D d/m/Y') }}</span>
                 </div>
 
                 <p class="px-6 py-2">This dashboard shows how many appointments have services in one or more of main
@@ -238,8 +226,14 @@
                         the last 14 days
                         @elseif ($reportPeriod == 5)
                         the last 28 days
-                        @else
-                        the last 7 days
+                        @elseif ($reportPeriod == 6)
+                        the last 210
+                        @elseif ($reportPeriod == 8)
+                        last week
+                        @elseif ($reportPeriod == 9)
+                        last month
+                        @elseif ($reportPeriod == 12)
+                        the last 5 days
                         @endif
                     </span>
                 </div>
@@ -328,8 +322,14 @@
                         the last 14 days
                         @elseif ($reportPeriod == 5)
                         the last 28 days
-                        @else
-                        the last 7 days
+                        @elseif ($reportPeriod == 6)
+                        the last 210
+                        @elseif ($reportPeriod == 8)
+                        last week
+                        @elseif ($reportPeriod == 9)
+                        last month
+                        @elseif ($reportPeriod == 12)
+                        the last 5 days
                         @endif
                     </span>
                 </div>

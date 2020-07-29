@@ -28,51 +28,69 @@ class DashboardController extends Controller
     public function getDashboard(Request $request)
     {
         //default reporting period to last seven days
-        $apptDateFrom = Carbon::today()->subDays(7);
-        $apptDateTo = Carbon::today();
+        $apptDateFromInclusive = Carbon::today()->subDays(6);
+        $apptDateToInclusive = Carbon::today();
 
         $reportPeriod = $request->input('reportPeriod');
         switch ($reportPeriod) {
             case 1:
                 //today
-                $apptDateFrom = Carbon::today();
-                $apptDateTo = Carbon::today();
+                $apptDateFromInclusive = Carbon::today();
+                $apptDateToInclusive = Carbon::today();
                 break;
             case 2:
                 //yesterday
-                $apptDateFrom = Carbon::today()->subDays(1);
-                $apptDateTo = Carbon::today();
+                $apptDateFromInclusive = Carbon::today()->subDays(1);
+                $apptDateToInclusive = Carbon::today()->subDays(1);
                 break;
             case 3:
                 //Last 7 Days
-                $apptDateFrom = Carbon::today()->subDays(7);
-                $apptDateTo = Carbon::today();
+                $apptDateFromInclusive = Carbon::today()->subDays(6);
+                $apptDateToInclusive = Carbon::today();
                 break;
             case 4:
                 //Last 14 Days
-                $apptDateFrom = Carbon::today()->subDays(14);
-                $apptDateTo = Carbon::today();
+                $apptDateFromInclusive = Carbon::today()->subDays(13);
+                $apptDateToInclusive = Carbon::today();
                 break;
             case 5:
                 //Last 28 Days
-                $apptDateFrom = Carbon::today()->subDays(28);
-                $apptDateTo = Carbon::today();
+                $apptDateFromInclusive = Carbon::today()->subDays(27);
+                $apptDateToInclusive = Carbon::today();
                 break;
             case 6:
                 //Last 210 Days
-                $apptDateFrom = Carbon::today()->subDays(210);
-                $apptDateTo = Carbon::today();
+                $apptDateFromInclusive = Carbon::today()->subDays(209);
+                $apptDateToInclusive = Carbon::today();
                 break;
             case 8:
                 //Last Week
-                $startOfCurrentWeek =
-                $apptDateFrom = Carbon::today()->subDays(28);
-                $apptDateTo = Carbon::today();
+                $apptDateFromInclusive = Carbon::today()->StartOfWeek()->subDays(1)->StartOfWeek();
+                $apptDateToInclusive = Carbon::today()->StartOfWeek()->subDays(1);
+                break;
+            case 9:
+                //Last Month
+                $apptDateFromInclusive = Carbon::today()->StartOfMonth()->subDays(1)->StartOfMonth();
+                $apptDateToInclusive = Carbon::today()->StartOfMonth()->subDays(1);
+            case 10:
+                //Two weeks ago
+                $apptDateFromInclusive = Carbon::today()->StartOfWeek()->subDays(8)->StartOfWeek();
+                $apptDateToInclusive = Carbon::today()->StartOfWeek()->subDays(7);
+                break;
+            case 11:
+                //Two months ago
+                $apptDateFromInclusive = Carbon::today()->StartOfMonth()->subDays(40)->StartOfMonth();
+                $apptDateToInclusive = Carbon::today()->StartOfMonth()->subDays(1)->StartOfMonth()->subDays(1);
+                break;
+            case 12:
+                //Last 5 Days
+                $apptDateFromInclusive = Carbon::today()->subDays(4);
+                $apptDateToInclusive = Carbon::today();
                 break;
             default:
-                //Last 7 Days
-                $apptDateFrom = Carbon::today()->subDays(7);
-                $apptDateTo = Carbon::today();
+            //Last 7 Days
+            $apptDateFromInclusive = Carbon::today()->subDays(6);
+            $apptDateToInclusive = Carbon::today();
         }
 
         $lastScheduleImport = date('D, jS M Y', strtotime(TimelyScheduleImport::max('imported_at')));
@@ -97,8 +115,8 @@ class DashboardController extends Controller
 
         //first add the numbers for each stylist
         $stylistNames = Appointment::where([
-            ['appointment_date', '>=', $apptDateFrom],
-            ['appointment_date', '<=', $apptDateTo],
+            ['appointment_date', '>=', $apptDateFromInclusive],
+            ['appointment_date', '<=', $apptDateToInclusive],
             ['status', 'Completed'],
         ])->distinct()->orderBy('primary_stylist')->pluck('primary_stylist');
 
@@ -106,27 +124,27 @@ class DashboardController extends Controller
 
         foreach ($stylistNames as $stylistName) {
 
-            $apptCount = $this->getCount($apptDateFrom, $apptDateTo, $stylistName, array(), 0);
-            $apptCountSmartbondTarget = $this->getCount($apptDateFrom, $apptDateTo, $stylistName, array('OR', 'has_colour', 'has_lightening', 'has_expert'), 0);
-            $apptCountTreatmentTarget = $this->getCount($apptDateFrom, $apptDateTo, $stylistName, array(), 0, array('has_pensioner', 'has_male', 'has_children'));
-            $custCount = $this->getCount($apptDateFrom, $apptDateTo, $stylistName, array(), 1);
-            $custCountSmartbondTarget = $this->getCount($apptDateFrom, $apptDateTo, $stylistName, array('OR', 'has_colour', 'has_lightening', 'has_expert'), 1);
-            $custCountTreatmentTarget = $this->getCount($apptDateFrom, $apptDateTo, $stylistName, array(), 1, array('has_pensioner', 'has_male', 'has_children'));
-            $globalColourCount = $this->getCount($apptDateFrom, $apptDateTo, $stylistName, array('has_colour'), 0);
-            $lighteningCount = $this->getCount($apptDateFrom, $apptDateTo, $stylistName, array('has_lightening'), 0);
-            $smartbondCount = $this->getCount($apptDateFrom, $apptDateTo, $stylistName, array('has_smartbond'), 0);
-            $treatmentCount = $this->getCount($apptDateFrom, $apptDateTo, $stylistName, array('has_treatment'), 0);
-            $cuttingCount = $this->getCount($apptDateFrom, $apptDateTo, $stylistName, array('has_cutting'), 0);
-            $stylingCount = $this->getCount($apptDateFrom, $apptDateTo, $stylistName, array('has_styling'), 0);
-            $addFoilsCount = $this->getCount($apptDateFrom, $apptDateTo, $stylistName, array('has_addonfoils'), 0);
-            $pensionerCount = $this->getCount($apptDateFrom, $apptDateTo, $stylistName, array('has_pensioner'), 0);
-            $maleCount = $this->getCount($apptDateFrom, $apptDateTo, $stylistName, array('has_male'), 0);
-            $childrenCount = $this->getCount($apptDateFrom, $apptDateTo, $stylistName, array('has_children'), 0);
-            $tonerCount = $this->getCount($apptDateFrom, $apptDateTo, $stylistName, array('has_toner'), 0);
-            $expertCount = $this->getCount($apptDateFrom, $apptDateTo, $stylistName, array('has_expert'), 0);
-            $smartbondPlusGlobalColourCount = $this->getCount($apptDateFrom, $apptDateTo, $stylistName, array('has_colour', 'has_smartbond'), 0);
-            $smartbondPlusLighteningCount = $this->getCount($apptDateFrom, $apptDateTo, $stylistName, array('has_lightening', 'has_smartbond'), 0);
-            $smartbondPlusExpertCount = $this->getCount($apptDateFrom, $apptDateTo, $stylistName, array('has_expert', 'has_smartbond'), 0);
+            $apptCount = $this->getCount($apptDateFromInclusive, $apptDateToInclusive, $stylistName, array(), 0);
+            $apptCountSmartbondTarget = $this->getCount($apptDateFromInclusive, $apptDateToInclusive, $stylistName, array('OR', 'has_colour', 'has_lightening', 'has_expert'), 0);
+            $apptCountTreatmentTarget = $this->getCount($apptDateFromInclusive, $apptDateToInclusive, $stylistName, array(), 0, array('has_pensioner', 'has_male', 'has_children'));
+            $custCount = $this->getCount($apptDateFromInclusive, $apptDateToInclusive, $stylistName, array(), 1);
+            $custCountSmartbondTarget = $this->getCount($apptDateFromInclusive, $apptDateToInclusive, $stylistName, array('OR', 'has_colour', 'has_lightening', 'has_expert'), 1);
+            $custCountTreatmentTarget = $this->getCount($apptDateFromInclusive, $apptDateToInclusive, $stylistName, array(), 1, array('has_pensioner', 'has_male', 'has_children'));
+            $globalColourCount = $this->getCount($apptDateFromInclusive, $apptDateToInclusive, $stylistName, array('has_colour'), 0);
+            $lighteningCount = $this->getCount($apptDateFromInclusive, $apptDateToInclusive, $stylistName, array('has_lightening'), 0);
+            $smartbondCount = $this->getCount($apptDateFromInclusive, $apptDateToInclusive, $stylistName, array('has_smartbond'), 0);
+            $treatmentCount = $this->getCount($apptDateFromInclusive, $apptDateToInclusive, $stylistName, array('has_treatment'), 0);
+            $cuttingCount = $this->getCount($apptDateFromInclusive, $apptDateToInclusive, $stylistName, array('has_cutting'), 0);
+            $stylingCount = $this->getCount($apptDateFromInclusive, $apptDateToInclusive, $stylistName, array('has_styling'), 0);
+            $addFoilsCount = $this->getCount($apptDateFromInclusive, $apptDateToInclusive, $stylistName, array('has_addonfoils'), 0);
+            $pensionerCount = $this->getCount($apptDateFromInclusive, $apptDateToInclusive, $stylistName, array('has_pensioner'), 0);
+            $maleCount = $this->getCount($apptDateFromInclusive, $apptDateToInclusive, $stylistName, array('has_male'), 0);
+            $childrenCount = $this->getCount($apptDateFromInclusive, $apptDateToInclusive, $stylistName, array('has_children'), 0);
+            $tonerCount = $this->getCount($apptDateFromInclusive, $apptDateToInclusive, $stylistName, array('has_toner'), 0);
+            $expertCount = $this->getCount($apptDateFromInclusive, $apptDateToInclusive, $stylistName, array('has_expert'), 0);
+            $smartbondPlusGlobalColourCount = $this->getCount($apptDateFromInclusive, $apptDateToInclusive, $stylistName, array('has_colour', 'has_smartbond'), 0);
+            $smartbondPlusLighteningCount = $this->getCount($apptDateFromInclusive, $apptDateToInclusive, $stylistName, array('has_lightening', 'has_smartbond'), 0);
+            $smartbondPlusExpertCount = $this->getCount($apptDateFromInclusive, $apptDateToInclusive, $stylistName, array('has_expert', 'has_smartbond'), 0);
 
             array_push($summary, array([
                 'stylist' => $stylistName,
@@ -154,14 +172,14 @@ class DashboardController extends Controller
 
         }
 
-        return view('dashboard', compact('reportPeriod', 'dbSummary', 'summary'));
+        return view('dashboard', compact('reportPeriod', 'dbSummary', 'summary', 'apptDateFromInclusive', 'apptDateToInclusive'));
     }
 
-    private function getCount($apptDateFrom, $apptDateTo, $stylistName, $flags, $custCount, $negatedFlags = array())
+    private function getCount($apptDateFromInclusive, $apptDateToInclusive, $stylistName, $flags, $custCount, $negatedFlags = array())
     {
 
-        $strWhereClauses = "appointment_date >= DATE('" . $apptDateFrom . "')";
-        $strWhereClauses .= " AND appointment_date <= DATE('" . $apptDateTo . "')";
+        $strWhereClauses = "appointment_date >= DATE('" . $apptDateFromInclusive . "')";
+        $strWhereClauses .= " AND appointment_date <= DATE('" . $apptDateToInclusive . "')";
         $strWhereClauses .= " AND status = 'Completed'";
 
         if ($stylistName != 'Salon Total') {
